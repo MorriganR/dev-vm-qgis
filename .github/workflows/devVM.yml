@@ -35,14 +35,18 @@ jobs:
         with:
           path: /home/runner/.cache/ccache
           key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ github.sha }}
+            ${{ runner.os }}-
 
       - name: Make
         run: |
           cd ${HOME}/dev/cpp/QGIS
-          ccache -p
           ccache -s -v
-          cat /home/runner/.config/ccache/ccache.conf || :
-          cat /etc/ccache.conf || :
+          echo "::group::config"
           cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS:BOOL=OFF -DWITH_BINDINGS:BOOL=OFF -B ${HOME}/dev/cpp/buildQGIS
-          cmake --build ${HOME}/dev/cpp/buildQGIS --target all -v -j2 || :
+          echo "::endgroup::"
+          echo "::group::make"
+          cmake --build ${HOME}/dev/cpp/buildQGIS --target all -j2 || :
+          echo "::endgroup::"
           ccache -s -v
