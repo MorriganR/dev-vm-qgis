@@ -25,12 +25,21 @@ jobs:
 
       - name: Clone
         run: |
+          pwd
           mkdir -p ${HOME}/dev/cpp
           cd ${HOME}/dev/cpp
-          git clone -b master --depth 5 --single-branch https://github.com/qgis/QGIS.git
+          git clone -b master --depth 1 --single-branch https://github.com/qgis/QGIS.git
+
+      - uses: actions/cache@v3
+        with:
+          path: /home/runner/.ccache
+          key: ${{ runner.os }}-${{ github.sha }}
 
       - name: Make
         run: |
+          ccache -p
+          ccache -s -v
           cd ${HOME}/dev/cpp/QGIS
           cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS:BOOL=OFF -DWITH_BINDINGS:BOOL=OFF -B ${HOME}/dev/cpp/buildQGIS
           cmake --build ${HOME}/dev/cpp/buildQGIS --target all
+          ccache -s -v
