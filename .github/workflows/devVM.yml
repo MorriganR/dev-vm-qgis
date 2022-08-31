@@ -1,5 +1,7 @@
 name: devVM
 on:
+  schedule:
+    - cron: '42 13 * * *'
   push:
     branches: [ main ]
   pull_request:
@@ -12,18 +14,26 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Dump GitHub context
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
+      - name: Dump context
+        run: |
+          echo '::group::Dump GitHub context'
+          echo '${{ toJSON(github) }}'
+          echo '::endgroup::'
+          echo '::group::Dump job context'
+          echo '${{ toJSON(job) }}'
+          echo '::endgroup::'
+          echo '::group::Dump steps context'
+          echo '${{ toJSON(steps) }}'
+          echo '::endgroup::'
+          echo '::group::Dump runner context'
+          echo '${{ toJSON(runner) }}'
+          echo '::endgroup::'
+          echo '::group::Dump strategy context'
+          echo '${{ toJSON(strategy) }}'
+          echo '::endgroup::'
+          echo '::group::Dump matrix context'
+          echo '${{ toJSON(matrix) }}'
+          echo '::endgroup::'
 
       - name: Install
         run: |
