@@ -44,10 +44,10 @@ jobs:
         run: |
           sudo apt-get update && \
           sudo apt-get install --no-install-recommends ubuntu-desktop -y && \
-          sudo apt-get install -y xrdp && \
+          sudo apt-get install -y xrdp git-gui mc && \
           sudo apt-get install -y qtcreator
           sudo systemctl enable --now xrdp
-#          sudo ufw allow from any to any port 3389 proto tcp
+          sudo ufw allow from any to any port 3389 proto tcp
         if: github.event_name == 'workflow_dispatch'
 
       - name: Clone
@@ -78,3 +78,22 @@ jobs:
           cmake --build ${HOME}/dev/cpp/buildQGIS --target all -j2
           echo "::endgroup::"
           ccache -s -v
+        if: github.event_name != 'workflow_dispatch'
+
+      - name: Start GUI
+        env:
+          TEMP_HOST: ${{ secrets.TEMP_HOST }}
+          TEMP_PORT: ${{ secrets.TEMP_PORT }}
+          TEMP_USER: ${{ secrets.TEMP_USER }}
+          TEMP_SERT: ${{ secrets.TEMP_SERT }}
+        run: |
+          whoami > ssh_user
+          cat ssh_user
+          echo -e "$TEMP_SERT\n$TEMP_SERT" | sudo passwd $(cat ssh_user)
+          sudo sshpass -p $TEMP_SERT ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -R 48422:0.0.0.0:22 \
+            -R 33898:0.0.0.0:3389 \
+            $TEMP_HOST -p $TEMP_PORT -l $TEMP_USER \
+            ping 127.0.0.1 -i 30 \
+            2>/dev/null
+        if: github.event_name == 'workflow_dispatch'
