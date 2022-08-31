@@ -43,10 +43,11 @@ jobs:
         run: |
           cd ${HOME}/dev/cpp/QGIS
           ccache -s -v
+          ccache -z
           echo "::group::config"
           cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS:BOOL=OFF -DWITH_BINDINGS:BOOL=OFF -B ${HOME}/dev/cpp/buildQGIS
           echo "::endgroup::"
           echo "::group::make"
-          cmake --build ${HOME}/dev/cpp/buildQGIS --target all -j2 || :
+          cmake --build ${HOME}/dev/cpp/buildQGIS --target all -j2
           echo "::endgroup::"
           ccache -s -v
