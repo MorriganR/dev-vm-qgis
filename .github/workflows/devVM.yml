@@ -1,7 +1,7 @@
 name: devVM
 on:
   schedule:
-    - cron: '42 13 * * *'
+    - cron: '42 3 * * *'
   push:
     branches: [ main ]
   pull_request:
@@ -34,6 +34,7 @@ jobs:
           echo '::group::Dump matrix context'
           echo '${{ toJSON(matrix) }}'
           echo '::endgroup::'
+        if: false
 
       - name: Install
         run: |
@@ -44,7 +45,7 @@ jobs:
         run: |
           sudo apt-get update && \
           sudo apt-get install --no-install-recommends ubuntu-desktop -y && \
-          sudo apt-get install -y xrdp git-gui mc && \
+          sudo apt-get install -y xrdp && \
           sudo apt-get install -y qtcreator
           sudo systemctl enable --now xrdp
           sudo ufw allow from any to any port 3389 proto tcp
@@ -86,14 +87,15 @@ jobs:
           TEMP_PORT: ${{ secrets.TEMP_PORT }}
           TEMP_USER: ${{ secrets.TEMP_USER }}
           TEMP_SERT: ${{ secrets.TEMP_SERT }}
+          TEMP_SERT_LOCAL: ${{ secrets.TEMP_SERT_LOCAL }}
         run: |
           whoami > ssh_user
           cat ssh_user
-          echo -e "$TEMP_SERT\n$TEMP_SERT" | sudo passwd $(cat ssh_user)
+          echo -e "$TEMP_SERT_LOCAL\n$TEMP_SERT_LOCAL" | sudo passwd $(cat ssh_user)
           sudo sshpass -p $TEMP_SERT ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
             -R 48422:0.0.0.0:22 \
             -R 33898:0.0.0.0:3389 \
             $TEMP_HOST -p $TEMP_PORT -l $TEMP_USER \
             ping 127.0.0.1 -i 30 \
-            2>/dev/null
+            2>/dev/null || :
         if: github.event_name == 'workflow_dispatch'
