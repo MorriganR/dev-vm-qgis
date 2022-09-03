@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo apt-get update && \
           sudo apt-get install -y xfce4 xfce4-goodies tightvncserver qtcreator
-        if: github.event_name == 'workflow_dispatch'
+#        if: github.event_name == 'workflow_dispatch'
 #          sudo apt-get install -y ubuntu-desktop xorgxrdp xrdp qtcreator
 #          sudo systemctl enable --now xrdp
 #          sudo ufw allow from any to any port 3389 proto tcp
@@ -74,10 +74,17 @@ jobs:
           ccache -s -v || ccache -s
           ccache -z
           echo "::group::config"
-          cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS:BOOL=OFF -DWITH_BINDINGS:BOOL=OFF -B ${HOME}/dev/cpp/buildQGIS
+          /usr/local/bin/cmake -S /home/runner/dev/cpp/QGIS -B /home/runner/dev/cpp/build-QGIS-Desktop-Debug \
+            -GNinja \
+            -DCMAKE_BUILD_TYPE:STRING=Debug \
+            -DCMAKE_PROJECT_INCLUDE_BEFORE:PATH=/usr/share/qtcreator/package-manager/auto-setup.cmake \
+            -DQT_QMAKE_EXECUTABLE:STRING=/usr/lib/qt5/bin/qmake \
+            -DCMAKE_PREFIX_PATH:STRING=/usr \
+            -DCMAKE_C_COMPILER:STRING=/usr/lib/ccache/gcc \
+            -DCMAKE_CXX_COMPILER:STRING=/usr/lib/ccache/g++
           echo "::endgroup::"
           echo "::group::make"
-          cmake --build ${HOME}/dev/cpp/buildQGIS --target all -j2
+          /usr/local/bin/cmake --build /home/runner/dev/cpp/build-QGIS-Desktop-Debug --target all -j2
           echo "::endgroup::"
           ccache -s -v || ccache -s
         if: github.event_name != 'workflow_dispatch'
