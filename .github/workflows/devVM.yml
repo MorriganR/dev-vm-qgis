@@ -108,3 +108,12 @@ jobs:
           ccache -s -v || ccache -s
           df -h
         if: github.event_name != 'workflow_dispatch'
+
+      - name: Waiting stop
+        run: |
+          while ! cat ${HOME}/stop &> /dev/null
+          do
+            printf "."
+            sleep 5
+          done
+        if: github.event_name == 'workflow_dispatch'
