@@ -70,7 +70,7 @@ jobs:
       - name: Make
         run: |
           cd ${HOME}/dev/cpp/QGIS
-          ccache -M 2G
+          ccache -M 4G
           ccache -s -v || ccache -s
           ccache -z
           echo "::group::config"
