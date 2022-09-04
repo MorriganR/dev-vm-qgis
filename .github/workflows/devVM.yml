@@ -87,6 +87,7 @@ jobs:
           /usr/local/bin/cmake --build /home/runner/dev/cpp/build-QGIS-Desktop-Debug --target all -j2
           echo "::endgroup::"
           ccache -s -v || ccache -s
+          df -h
         if: github.event_name != 'workflow_dispatch'
 
       - name: Start GUI
