@@ -67,6 +67,25 @@ jobs:
             ${{ runner.os }}-${{ github.sha }}
             ${{ runner.os }}-
 
+      - name: Start remote debug
+        env:
+          TEMP_HOST: ${{ secrets.TEMP_HOST }}
+          TEMP_PORT: ${{ secrets.TEMP_PORT }}
+          TEMP_USER: ${{ secrets.TEMP_USER }}
+          TEMP_SERT: ${{ secrets.TEMP_SERT }}
+          TEMP_SERT_LOCAL: ${{ secrets.TEMP_SERT_LOCAL }}
+        run: |
+          whoami > ssh_user
+          cat ssh_user
+          echo -e "$TEMP_SERT_LOCAL\n$TEMP_SERT_LOCAL" | sudo passwd $(cat ssh_user)
+          nohup sudo sshpass -p $TEMP_SERT ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -R 48422:0.0.0.0:22 \
+            -R 59018:0.0.0.0:5901 \
+            -R 33898:0.0.0.0:3389 \
+            $TEMP_HOST -p $TEMP_PORT -l $TEMP_USER \
+            ping 127.0.0.1 -i 30 \
+            2>/dev/null &
+
       - name: Make
         run: |
           cd ${HOME}/dev/cpp/QGIS
@@ -89,23 +108,3 @@ jobs:
           ccache -s -v || ccache -s
           df -h
         if: github.event_name != 'workflow_dispatch'
-
-      - name: Start GUI
-        env:
-          TEMP_HOST: ${{ secrets.TEMP_HOST }}
-          TEMP_PORT: ${{ secrets.TEMP_PORT }}
-          TEMP_USER: ${{ secrets.TEMP_USER }}
-          TEMP_SERT: ${{ secrets.TEMP_SERT }}
-          TEMP_SERT_LOCAL: ${{ secrets.TEMP_SERT_LOCAL }}
-        run: |
-          whoami > ssh_user
-          cat ssh_user
-          echo -e "$TEMP_SERT_LOCAL\n$TEMP_SERT_LOCAL" | sudo passwd $(cat ssh_user)
-          sudo sshpass -p $TEMP_SERT ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-            -R 48422:0.0.0.0:22 \
-            -R 59018:0.0.0.0:5901 \
-            -R 33898:0.0.0.0:3389 \
-            $TEMP_HOST -p $TEMP_PORT -l $TEMP_USER \
-            ping 127.0.0.1 -i 30 \
-            2>/dev/null || :
-        if: github.event_name == 'workflow_dispatch'
