@@ -39,7 +39,12 @@ jobs:
       - name: Install GUI
         run: |
           sudo apt-get update && \
-          sudo apt-get install -y xfce4 xfce4-goodies tightvncserver qtcreator
+          sudo apt-get install -y xfce4 tightvncserver
+          wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+          sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+          sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+          rm -f packages.microsoft.gpg
+          sudo apt update && sudo apt install code
 #        if: github.event_name == 'workflow_dispatch'
 #          sudo apt-get install -y ubuntu-desktop xorgxrdp xrdp qtcreator
 #          sudo systemctl enable --now xrdp
@@ -52,7 +57,7 @@ jobs:
           ccache -M 6G
           mkdir -p ${HOME}/dev/cpp
           cd ${HOME}/dev/cpp
-          git clone -b master --depth 1 --single-branch https://github.com/qgis/QGIS.git
+          git clone -b master --depth 1 --single-branch https://github.com/MorriganR/QGIS.git
 
       - uses: actions/cache@v3
         with:
