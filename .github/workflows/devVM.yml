@@ -101,7 +101,9 @@ jobs:
             -DQT_QMAKE_EXECUTABLE:STRING=/usr/lib/qt5/bin/qmake \
             -DCMAKE_PREFIX_PATH:STRING=/usr \
             -DCMAKE_C_COMPILER:STRING=/usr/lib/ccache/gcc \
-            -DCMAKE_CXX_COMPILER:STRING=/usr/lib/ccache/g++
+            -DCMAKE_CXX_COMPILER:STRING=/usr/lib/ccache/g++ \
+            -DC:STRING=/usr/lib/ccache/gcc \
+            -DCXX:STRING=/usr/lib/ccache/g++
           echo "::endgroup::"
           echo "::group::make"
           /usr/local/bin/cmake --build /home/runner/dev/cpp/build-QGIS-Desktop-Debug --target all -j2
