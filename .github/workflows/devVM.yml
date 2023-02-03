@@ -58,7 +58,7 @@ jobs:
           ccache -M 6G
           mkdir -p ${HOME}/dev/cpp
           cd ${HOME}/dev/cpp
-          git clone -b master --depth 1 --single-branch https://github.com/QGIS/QGIS.git
+          git clone -b master --depth 1 --single-branch https://github.com/MorriganR/QGIS.git
 
       - uses: actions/cache@v3
         with:
